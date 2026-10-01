@@ -44,7 +44,7 @@ svg.c{display:block;overflow:visible;transform:rotate(var(--r,0deg))}
 .pic{background:#fff;padding:12px 12px 40px;border-radius:14px;box-shadow:0 16px 40px rgba(4,26,69,.35);transform:rotate(-2.5deg)}
 .chap:nth-of-type(even) .pic{transform:rotate(2.5deg)}
 .ph{aspect-ratio:4/5;border-radius:8px;background:linear-gradient(160deg,#b9e4ff,#c9f0b0);display:grid;place-items:center;text-align:center;font-weight:700;padding:16px;overflow:hidden}
-.ph img{width:100%;height:100%;object-fit:cover}
+.ph img{width:100%;height:100%;object-fit:cover}.media-placeholder{width:100%;height:100%;min-height:180px;display:grid;place-items:center;text-align:center;padding:24px;background:linear-gradient(145deg,#dff5ff,#d8f4c8);color:var(--ink);font:600 18px/1.35 Fredoka,sans-serif}.media-placeholder small{display:block;font:500 13px/1.4 Nunito,sans-serif;opacity:.75;margin-top:6px}
 .txt{background:rgba(255,255,255,.86);border-radius:20px;padding:22px}
 .chip{display:inline-block;background:#2e8b3d;color:#fff;font:600 14px Fredoka,sans-serif;padding:5px 14px;border-radius:99px}
 .chap h3{font-size:clamp(25px,5vw,38px);margin:12px 0 8px}
@@ -88,7 +88,7 @@ svg.c{display:block;overflow:visible;transform:rotate(var(--r,0deg))}
 #wi{font:600 16px Nunito,sans-serif;padding:11px 16px;border-radius:99px;border:0;width:min(340px,80vw);text-align:center;margin-top:8px}#hist{color:#fff;margin:14px auto 0;max-width:40ch;font-size:14px;line-height:1.6}
 #gal{padding:64px 16px;text-align:center}#gal[hidden],#lock[hidden]{display:none}#gal h2{font:600 clamp(26px,5vw,38px) Fredoka,sans-serif;margin:0 0 18px}
 .gw{max-width:600px;margin:0 auto;display:flex;align-items:center;gap:8px}.gt{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:18px;flex:1;background:#fff6}.gt::-webkit-scrollbar{display:none}
-.gt figure{flex:0 0 100%;margin:0;scroll-snap-align:center}.gt img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}.gt figcaption{padding:10px;font-weight:700}
+.gt figure{flex:0 0 100%;margin:0;scroll-snap-align:center}.gt img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}.gt .gallery-placeholder{aspect-ratio:4/3;display:grid;place-items:center;text-align:center;padding:24px;background:linear-gradient(145deg,#dff5ff,#ffe5b5);font:600 20px/1.3 Fredoka,sans-serif;color:var(--ink)}.gt figcaption{padding:10px;font-weight:700}.gallery-note{margin:12px auto 0;max-width:42ch;font-size:14px;opacity:.8}
 .gb{flex:none;width:44px;height:44px;border-radius:50%;border:0;font-size:26px;cursor:pointer;background:#fff;color:var(--ink,#123)}.gb:focus-visible,.gt:focus-visible{outline:3px solid var(--ink,#123);outline-offset:2px}
 .gd{display:flex;gap:8px;justify-content:center;margin-top:12px}.gd i{width:9px;height:9px;border-radius:50%;background:#fff8}.gd i.on{background:var(--ink,#123)}
 #lock{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;background:linear-gradient(#0b2a4a,#12395f);color:#fff}
@@ -119,7 +119,7 @@ svg.c{display:block;overflow:visible;transform:rotate(var(--r,0deg))}
     <h1>Happy Birthday,<br><span id="nm"></span>!</h1>
     <p>Aku bikin sesuatu buat kamu. Ada ikan, ubur-ubur, dan sapi, jadi ini serius.</p>
     <div class="cast" data-cast="clown tang jelly cow puffer angel"></div>
-    <div class="cue">Ketuk hewannya, mereka bisa ngomong. Lalu scroll ya, kita timeskip.</div><div class="cnt" id="cnt"></div>
+    <div class="cue">Ketuk hewannya, mereka bisa ngomong. Ketuk langit untuk memanggil ikan. Lalu scroll ya, kita timeskip.</div><div class="cnt" id="cnt"></div>
   </div>
   <div class="hills"><div class="herd" data-cast="cow cow whale cow cow"></div></div>
 </header>
@@ -175,8 +175,10 @@ const CFG={name:'Nama Dia',from:'Nama Kamu',
  {skip:'Sekarang…',sub:'Dan kita masih di sini',date:'Hari ini',title:'Sampai hari ini',text:'Pesan pendek yang menyambung ke ucapan di bawah.',photo:'img/4.jpg',back:'Harapan untuk tahun ini.'}]};
 // =============================
 const $=id=>document.getElementById(id),toast=m=>{const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),3100)};
+function mediaFallback(img,path){const d=document.createElement('div');d.className='media-placeholder';d.innerHTML=`📷<br>Foto ini belum ditambahkan<small>Tambahkan ${path}</small>`;img.replaceWith(d)}
+function galleryFallback(img,path){const d=document.createElement('div');d.className='gallery-placeholder';d.innerHTML=`🖼️<br>Foto galeri belum ditambahkan<small>Tambahkan ${path}</small>`;img.replaceWith(d)}
 $('nm').textContent=$('nm2').textContent=CFG.name;$('fr').textContent=CFG.from;document.title='Happy Birthday, '+CFG.name;
-$('story').innerHTML=CFG.chapters.map(c=>`<section class="skip"><div><h2>${c.skip}</h2><small>${c.sub}</small></div></section><article class="chap"><div class="pic"><div class="flip" tabindex="0" role="button" aria-label="Balik foto"><div class="in"><div class="ph">${c.photo?`<img src="${c.photo}" alt="${c.title}" loading="lazy" onerror="this.replaceWith('Taruh foto di ${c.photo}')">`:'Taruh foto di sini'}</div><div class="ph back">${c.back}</div></div></div></div><div class="txt"><span class="chip">${c.date}</span><h3>${c.title}</h3><p>${c.text}</p></div></article>`).join('');
+$('story').innerHTML=CFG.chapters.map(c=>`<section class="skip"><div><h2>${c.skip}</h2><small>${c.sub}</small></div></section><article class="chap"><div class="pic"><div class="flip" tabindex="0" role="button" aria-label="Balik foto"><div class="in"><div class="ph">${c.photo?`<img src="${c.photo}" alt="${c.title}" loading="lazy" onerror="mediaFallback(this,'${c.photo}')">`:'<div class="media-placeholder">📷<br>Foto chapter ini<br><small>Belum ditambahkan</small></div>'}</div><div class="ph back">${c.back}</div></div></div></div><div class="txt"><span class="chip">${c.date}</span><h3>${c.title}</h3><p>${c.text}</p></div></article>`).join('');
 // penghitung jangka panjang: hari bersama + hitung mundur ulang tahun berikutnya
 (function(){const n=new Date(),d0=new Date(n.getFullYear(),n.getMonth(),n.getDate()),days=Math.floor((d0-new Date(CFG.since+'T00:00:00'))/864e5),[m,d]=CFG.birthday.split('-').map(Number);
  let b=new Date(n.getFullYear(),m-1,d);if(b<d0)b=new Date(n.getFullYear()+1,m-1,d);const left=Math.round((b-d0)/864e5);
@@ -184,7 +186,8 @@ $('story').innerHTML=CFG.chapters.map(c=>`<section class="skip"><div><h2>${c.ski
  if(!left)addEventListener('load',()=>setTimeout(()=>toast('Selamat ulang tahun! Tiup lilinnya di bawah'),1200))})();
 // galeri geser
 (function(){const g=CFG.gallery||[];if(!g.length)return;$('gal').hidden=false;const t=$('gt'),d=$('gd');
- t.innerHTML=g.map(x=>`<figure><img src="${x.src}" alt="${x.cap}" loading="lazy" onerror="this.alt='Taruh foto di ${x.src}';this.style.background='#fff8'"><figcaption>${x.cap}</figcaption></figure>`).join('');
+ t.innerHTML=g.map(x=>`<figure><img src="${x.src}" alt="${x.cap}" loading="lazy" onerror="galleryFallback(this,'${x.src}')"><figcaption>${x.cap}</figcaption></figure>`).join('');
+ t.insertAdjacentHTML('afterend','<p class="gallery-note">Galeri sudah siap. Foto bisa ditambahkan satu per satu nanti.</p>');
  d.innerHTML=g.map(()=>'<i></i>').join('');const dots=[...d.children],cur=()=>Math.round(t.scrollLeft/t.clientWidth),
  mark=()=>dots.forEach((e,i)=>e.classList.toggle('on',i===cur()));t.addEventListener('scroll',mark,{passive:true});mark();
  $('gp').onclick=()=>t.scrollBy({left:-t.clientWidth,behavior:'smooth'});$('gn').onclick=()=>t.scrollBy({left:t.clientWidth,behavior:'smooth'})})();
